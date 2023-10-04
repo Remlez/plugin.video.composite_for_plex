@@ -15,7 +15,6 @@ import xbmc  # pylint: disable=import-error
 
 from .constants import CONFIG
 from .constants import StreamControl
-from .dialogs.skip_intro import SkipIntroDialog
 from .logger import Logger
 from .strings import encode_utf8
 from .strings import i18n
@@ -39,7 +38,6 @@ class PlaybackMonitorThread(threading.Thread):
         self._window = window
 
         self._monitor_dict = monitor_dict
-        self._dialog_skip_intro = None
 
         self.daemon = True
         self.start()
@@ -214,32 +212,6 @@ class PlaybackMonitorThread(threading.Thread):
 
         return False
 
-    def _skip_intro_dialog(self):
-        if self._dialog_skip_intro is not None:
-            return
-
-        self._dialog_skip_intro = SkipIntroDialog('skip_intro.xml',
-                                                  CONFIG['addon'].getAddonInfo('path'),
-                                                  'default', '720p', intro_end=self._intro_end())
-
-    def skip_intro(self):
-        if (self.settings.intro_skipping() and
-                self._intro_start() is not None and self._intro_end() is not None):
-            if (self._dialog_skip_intro and self._dialog_skip_intro.on_hold and
-                    (self._intro_start() > self._get_time_ms() or
-                     self._get_time_ms() > self._intro_end())):
-                self._dialog_skip_intro.on_hold = False
-
-            if self._intro_start() <= self._get_time_ms() < self._intro_end():
-                self._skip_intro_dialog()
-                self._dialog_skip_intro.show()
-
-            elif self._dialog_skip_intro and self._get_time_ms() >= self._intro_end():
-                self._dialog_skip_intro.close()
-
-            elif self._dialog_skip_intro and self._get_time_ms() < self._intro_start():
-                self._dialog_skip_intro.close()
-
     def run(self):
         current_time = 0
         played_time = 0
@@ -268,8 +240,6 @@ class PlaybackMonitorThread(threading.Thread):
 
             current_time, total_time, progress = self._get_playback_progress(total_time)
 
-            self.skip_intro()
-
             try:
                 report = int((float(waited) / 10.0)) >= 1
             except ZeroDivisionError:
@@ -294,9 +264,6 @@ class PlaybackMonitorThread(threading.Thread):
             waited += wait_time
 
         _ = self.report_playback_progress(current_time, total_time, progress)
-
-        if self._dialog_skip_intro and self._dialog_skip_intro.showing:
-            self._dialog_skip_intro.close()
 
         if self.session() is not None:
             self.LOG.debug('Stopping PMS transcode job with session %s' % self.session())

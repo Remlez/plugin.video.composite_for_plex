@@ -153,11 +153,6 @@ def run(start_time):  # pylint: disable=too-many-locals, too-many-statements, to
         add_playlist_item.run(context)
         return _finished(start_time)
 
-    if command == COMMANDS.TEST_SKIP_INTRO_DIALOG:
-        from .routes import test_skip_intro_dialog
-        test_skip_intro_dialog.run()
-        return _finished(start_time)
-
     if command == COMMANDS.COMPOSITE_PLAYLIST:
         from .routes import composite_playlist
         composite_playlist.run(context)

@@ -19,4 +19,4 @@ __all__ = ['add_playlist_item', 'all_all_servers', 'channel_search', 'channel_se
            'process_plex_online', 'process_plex_plugins', 'process_tracks', 'process_episodes',
            'process_seasons', 'process_shows', 'process_xml', 'refresh', 'refresh_library',
            'search_all', 'search_all_servers', 'set_audio', 'set_master_server', 'set_subtitles',
-           'sign_in', 'sign_out', 'switch_user', 'test_skip_intro_dialog', 'watch_status']
+           'sign_in', 'sign_out', 'switch_user', 'watch_status']
